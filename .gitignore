@@ -1,0 +1,24 @@
+# Local editor / agent files
+.DS_Store
+.codex/
+.agents/
+.idea/
+.vscode/
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Generated build / cache files
+.build/
+.swiftpm/
+DerivedData/
+build/
+dist/
+node_modules/
+__pycache__/
+*.pyc
+*.xcuserstate
