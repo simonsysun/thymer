@@ -21,6 +21,23 @@ Quit an older copy before opening a newly built one. Once ready to use a build,
 copy `dist/Thymer.app` to Applications. Launch it normally for daily use;
 Settings → Quit or Cmd-Q closes it. Reopening it brings back the panel when hidden.
 
+## Unnotarized test builds
+
+The initial downloadable build targets **Apple Silicon (arm64), macOS 26+**.
+Intel compatibility is not claimed. Builds are ad-hoc signed and intentionally
+not notarized by Apple.
+
+For a ZIP test build, extract it, quit an older Thymer copy, and move `Thymer.app`
+to Applications. Existing records use the same data directory. Open the app.
+If macOS blocks it because the developer cannot be verified, and you trust the
+source, follow [Apple’s instructions](https://support.apple.com/en-la/102445):
+after attempting to open it, go to System Settings → Privacy & Security →
+Open Anyway, then confirm opening. Managed Macs may restrict this option.
+
+A release should include a SHA-256 checksum, its source commit, and known
+limitations. A successful local launch does not establish that a browser-downloaded
+copy has passed the first-open workflow on another Mac.
+
 ## Using the dial
 
 - The inner, short hand sets Work; the outer mint hand sets Cycle end. One turn

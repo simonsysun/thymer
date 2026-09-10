@@ -30,7 +30,7 @@ Build on **macOS 26+** with Xcode 26 command-line tools and Python 3:
 open 'dist/Thymer.app'
 ```
 
-Local builds are ad-hoc signed, not notarized. See the [build and recording guide](NATIVE.md) for setup, controls, and current limitations.
+The first downloadable build will target Apple Silicon and macOS 26+. Builds are ad-hoc signed and intentionally not notarized; first launch may require **Open Anyway** in System Settings → Privacy & Security. See the [build and recording guide](NATIVE.md) for setup, controls, and current limitations.
 
 ## Looking ahead
 

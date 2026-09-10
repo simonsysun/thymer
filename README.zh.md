@@ -30,7 +30,7 @@ Thymer 目前是持续测试中的 macOS MVP，**暂未提供下载版 release**
 open 'dist/Thymer.app'
 ```
 
-本地构建使用临时签名，尚未公证。安装、操作与当前限制见[构建与记录指南](NATIVE.md)。
+首个下载版将面向 Apple Silicon、macOS 26+。构建使用临时签名，不做 Apple 公证；首次打开可能需要在“系统设置 → 隐私与安全性”中选择“仍要打开”。安装、操作与当前限制见[构建与记录指南](NATIVE.md)。
 
 ## 接下来
 
