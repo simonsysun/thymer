@@ -1,5 +1,7 @@
 # 首页交互与视觉设计
 
+> Historical design snapshot (2026-09-07). Superseded by the [current app guide](../../NATIVE.md) and [public roadmap](../../README.md#building-in-public). Details below describe an earlier prototype, not current behavior.
+
 日期：2026-09-07。产品规则见 [PRODUCT.md](PRODUCT.md)。这是主代理根据 Simon 的草图和本次讨论制定的第一版方案；实现须服从此处规则，不以实现便利擅自添加功能。
 
 ## 视觉主张

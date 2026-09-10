@@ -1,5 +1,7 @@
 # 给另一个模型的设计评审 Prompt
 
+> Historical design snapshot (2026-09-07). Superseded by the [current app guide](../../NATIVE.md) and [public roadmap](../../README.md#building-in-public). Details below describe an earlier prototype, not current behavior.
+
 请作为一位擅长 macOS 原生应用、实体控件交互与动效的产品设计师，独立评审并重新设计这个工作／休息计时器首页。现有 SwiftUI 预览能运行，但我不满意它的简洁程度、拨杆造型和部分交互。你的任务是理解我的原始意图，提出具体、可视化、可实现的改版方案；本轮先做设计评审，不要直接修改项目代码。
 
 ## 先处理资料的优先级

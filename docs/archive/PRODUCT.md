@@ -1,5 +1,7 @@
 # Work Rest Timer
 
+> Historical design snapshot (2026-09-07). Superseded by the [current app guide](../../NATIVE.md) and [public roadmap](../../README.md#building-in-public). Details below describe an earlier prototype, not current behavior.
+
 状态：2026-09-07 的产品草案；原生 SwiftUI 首页交互预览阶段，尚未完成可日常使用的记录产品。
 
 ## 要解决的问题

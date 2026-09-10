@@ -22,3 +22,14 @@ node_modules/
 __pycache__/
 *.pyc
 *.xcuserstate
+
+# Private local handoffs, QA screenshots, and working records
+/docs/handoff/
+/local/
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+*.log
+*.app/
+*.dSYM/

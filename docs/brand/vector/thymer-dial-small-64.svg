@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="512" height="512" viewBox="0 0 512 512">
+<title>Thymer — optical 64px variant</title>
+<desc>Editable flat vector concept. Clockwise from 285 degrees: Work 204, Rest 72, white 84. Shared center; unequal hand lengths. No gradients or effects.</desc>
+<g id="dial" inkscape:groupmode="layer" inkscape:label="Dial sectors">
+<circle cx="256" cy="256" r="192" fill="#F7F9FC"/>
+<path id="work" d="M 256,256 L 70.542241,206.306743 A 192,192 0 1 1 405.212025,376.829515 Z" fill="#93A6BE"/>
+<path id="rest" d="M 256,256 L 405.212025,376.829515 A 192,192 0 0 1 187.193354,435.247442 Z" fill="#A1CABB"/>
+<circle cx="256" cy="256" r="192" fill="none" stroke="#D7DDE5" stroke-width="1"/>
+</g>
+<g id="work-hand" inkscape:groupmode="layer" inkscape:label="Work hand"><path d="M 312.700569,301.915216 L 381.338101,357.496793" fill="none" stroke="#46566B" stroke-width="12.000000" stroke-linecap="round"/><circle cx="381.338101" cy="357.496793" r="12.000000" fill="#46566B"/></g>
+<g id="cycle-hand" inkscape:groupmode="layer" inkscape:label="Cycle hand"><path d="M 229.853474,324.114028 L 187.193354,435.247442" fill="none" stroke="#2D8975" stroke-width="12.000000" stroke-linecap="round"/><circle cx="187.193354" cy="435.247442" r="12.000000" fill="#2D8975"/></g>
+<g id="center" inkscape:groupmode="layer" inkscape:label="Flat white center"><circle cx="256" cy="256" r="72.96000000000001" fill="#FFFFFF"/></g>
+</svg>

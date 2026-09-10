@@ -1,5 +1,7 @@
 # 原生预览检查记录
 
+> Historical design snapshot (2026-09-07). Superseded by the [current app guide](../../NATIVE.md) and [public roadmap](../../README.md#building-in-public). Details below describe an earlier prototype, not current behavior.
+
 日期：2026-09-07。范围：本地 SwiftUI 交互预览。设计与产品规则由主代理制定；Terra 实现两份视图文件，主代理独立审查、提出一次定界修正，并完成计时引擎、Mac 外壳、集成修正和验收。
 
 ## 已验证
