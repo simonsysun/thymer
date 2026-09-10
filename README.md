@@ -21,7 +21,7 @@ Ideas or feedback? [Open an issue](https://github.com/simonsysun/thymer/issues) 
 
 ## Try it
 
-**[Download v0.1.0-beta.1 for Apple Silicon](https://github.com/simonsysun/thymer/releases/download/v0.1.0-beta.1/Thymer-v0.1.0-beta.1-macos-arm64.zip)** · [Release notes & checksums](https://github.com/simonsysun/thymer/releases/tag/v0.1.0-beta.1)
+**[Download v0.1.0-beta.1 for Apple Silicon](https://github.com/simonsysun/thymer/releases/download/v0.1.0-beta.1/Thymer-v0.1.0-beta.1-macos-arm64.zip)** · [Release notes & checksums](https://github.com/simonsysun/thymer/releases/tag/v0.1.0-beta.1#user-content-english)
 
 An early public beta for **macOS 26+**. Unzip, move `Thymer.app` to Applications, and open it. Quit an older copy before replacing it; existing records are kept.
 

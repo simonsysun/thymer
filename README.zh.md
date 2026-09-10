@@ -21,7 +21,7 @@
 
 ## 试一试
 
-**[下载 v0.1.0-beta.1 · Apple Silicon 版](https://github.com/simonsysun/thymer/releases/download/v0.1.0-beta.1/Thymer-v0.1.0-beta.1-macos-arm64.zip)** · [发布说明与校验文件](https://github.com/simonsysun/thymer/releases/tag/v0.1.0-beta.1)
+**[下载 v0.1.0-beta.1 · Apple Silicon 版](https://github.com/simonsysun/thymer/releases/download/v0.1.0-beta.1/Thymer-v0.1.0-beta.1-macos-arm64.zip)** · [发布说明与校验文件](https://github.com/simonsysun/thymer/releases/tag/v0.1.0-beta.1#user-content-zh)
 
 这是面向 **macOS 26+** 的首个公开测试版。解压后将 `Thymer.app` 拖入“应用程序”并打开。更新前先退出旧版，原有记录会保留。
 
