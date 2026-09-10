@@ -21,7 +21,9 @@ Ideas or feedback? [Open an issue](https://github.com/simonsysun/thymer/issues) 
 
 ## Try it
 
-Thymer is an early macOS MVP under active testing. **No downloadable release yet.**
+**[Download v0.1.0-beta.1 for Apple Silicon](https://github.com/simonsysun/thymer/releases/download/v0.1.0-beta.1/Thymer-v0.1.0-beta.1-macos-arm64.zip)** · [Release notes & checksums](https://github.com/simonsysun/thymer/releases/tag/v0.1.0-beta.1)
+
+An early public beta for **macOS 26+**. Unzip, move `Thymer.app` to Applications, and open it. Quit an older copy before replacing it; existing records are kept.
 
 Build on **macOS 26+** with Xcode 26 command-line tools and Python 3:
 
@@ -30,7 +32,7 @@ Build on **macOS 26+** with Xcode 26 command-line tools and Python 3:
 open 'dist/Thymer.app'
 ```
 
-The first downloadable build will target Apple Silicon and macOS 26+. Builds are ad-hoc signed and intentionally not notarized; first launch may require **Open Anyway** in System Settings → Privacy & Security. See the [build and recording guide](NATIVE.md) for setup, controls, and current limitations.
+The download supports Apple Silicon and macOS 26+. Builds are ad-hoc signed and intentionally not notarized; first launch may require **Open Anyway** in System Settings → Privacy & Security. See the [build and recording guide](NATIVE.md) for setup, controls, and current limitations.
 
 ## Looking ahead
 

@@ -9,7 +9,7 @@ For build and test instructions, see [NATIVE.md](NATIVE.md). Use independent tes
 data and preserve the recording rules when changing the timer.
 
 Keep `README.md` and `README.zh.md` in sync. Describe current features accurately
-and keep future plans broad. The first release is pending final hands-on checks.
+and keep future plans broad. The current release is an early public beta; report reproducible issues and keep known limitations visible.
 
 Before submitting changes, run `python3 scripts/check-public-files.py`. Local
 handoffs, screenshots of personal data, credentials, and databases must stay out

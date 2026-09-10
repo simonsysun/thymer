@@ -26,3 +26,11 @@ Known limits: macOS 26+, Apple Silicon distribution only; no notarization,
 automatic updates, export, sync or login launch. macOS may hide menu-bar items
 when space is constrained. This test did not reproduce a separate startup-only
 pointer displacement. No claim of universal bug absence or a new full security scan.
+
+## Published beta — 2026-09-09
+
+[v0.1.0-beta.1](https://github.com/simonsysun/thymer/releases/tag/v0.1.0-beta.1) was published as a pre-release from
+`c69b7ac02a499db682f88c7cadfcd0bf9e8b5d5f`. The clean build was packaged as an
+arm64 ZIP; ZIP and checksum assets were downloaded from GitHub and matched their
+local originals byte for byte before publication. The executable minimum OS is
+26.0. The first-open validation limitation above remains unchanged.

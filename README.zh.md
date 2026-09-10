@@ -21,7 +21,9 @@
 
 ## 试一试
 
-Thymer 目前是持续测试中的 macOS MVP，**暂未提供下载版 release**。
+**[下载 v0.1.0-beta.1 · Apple Silicon 版](https://github.com/simonsysun/thymer/releases/download/v0.1.0-beta.1/Thymer-v0.1.0-beta.1-macos-arm64.zip)** · [发布说明与校验文件](https://github.com/simonsysun/thymer/releases/tag/v0.1.0-beta.1)
+
+这是面向 **macOS 26+** 的首个公开测试版。解压后将 `Thymer.app` 拖入“应用程序”并打开。更新前先退出旧版，原有记录会保留。
 
 在 **macOS 26+** 上，安装 Xcode 26 命令行工具和 Python 3 后构建：
 
@@ -30,7 +32,7 @@ Thymer 目前是持续测试中的 macOS MVP，**暂未提供下载版 release**
 open 'dist/Thymer.app'
 ```
 
-首个下载版将面向 Apple Silicon、macOS 26+。构建使用临时签名，不做 Apple 公证；首次打开可能需要在“系统设置 → 隐私与安全性”中选择“仍要打开”。安装、操作与当前限制见[构建与记录指南](NATIVE.md)。
+下载版支持 Apple Silicon、macOS 26+。构建使用临时签名，不做 Apple 公证；首次打开可能需要在“系统设置 → 隐私与安全性”中选择“仍要打开”。安装、操作与当前限制见[构建与记录指南](NATIVE.md)。
 
 ## 接下来
 

@@ -14,7 +14,7 @@ open 'dist/Thymer.app'
 ```
 
 The script builds for the current Mac’s CPU. Local builds are ad-hoc signed, not
-Developer ID signed or notarized. No downloadable release has been published.
+Developer ID signed or notarized. The first [public beta](https://github.com/simonsysun/thymer/releases/tag/v0.1.0-beta.1) is available for Apple Silicon.
 The build number appears when hovering over the version in Settings.
 
 Quit an older copy before opening a newly built one. Once ready to use a build,
