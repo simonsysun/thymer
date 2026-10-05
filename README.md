@@ -1,3 +1,8 @@
+---
+type: project
+start: 2026-09
+---
+
 # Thymer
 
 <img src="docs/brand/app-icon/thymer-app-icon-v1.png" alt="Thymer app icon" width="128" />
