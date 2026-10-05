@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en-US" data-transition-preview="true">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Work Rest Timer · 表盘预览</title>
+<title>Work Rest Timer · Dial preview</title>
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; background: #f4f5f7; color: #2b2d33; font: 14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
@@ -19,6 +19,7 @@
   .segmented { display: flex; gap: 3px; padding: 3px; background: #e7e9ed; border-radius: 9px; }
   .segmented button { flex: 1; border: 0; border-radius: 6px; color: #767d87; background: transparent; padding: 6px 5px; font-size: 12px; white-space: nowrap; }
   .segmented button[aria-pressed="true"] { color: #2b2d33; background: white; box-shadow: 0 1px 3px #0000000c; }
+  .control select { width:100%; padding:6px; border:1px solid #d5d9e0; border-radius:7px; background:#fff; color:#424d5c; }
   .control input[type=range] { width: 100%; accent-color: #606b7e; }
   .check { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #66707d; margin-top: 14px; }
   .check input { accent-color: #647a9d; }
@@ -27,9 +28,11 @@
   .menubar { height: 38px; display: flex; justify-content: flex-end; align-items: center; padding: 0 31px; border-bottom: 1px solid #d7dbe1; background: #f8f9fac4; }
   .menu-trigger { padding: 2px 8px; border: 0; border-radius: 5px; background: #dfe3e9; color: #505966; display: flex; align-items: center; gap: 7px; font-size: 12px; font-variant-numeric: tabular-nums; }
   .menu-trigger svg { width: 16px; height: 16px; }
-  .popover { --surface: #25272b; --ink:#edf0f5; --muted:#9096a1; --hairline:#ffffff15; --plane:#ffffff06; --plane-inner:#ffffff07; --track:#ffffff16; --hand:#e5e8ed; --rest-hand:#70cab2; --work-fill:#8da9d3; --rest-fill:#62bba1; --accent:#a7b6d2; --used:#a7b6d211; --remaining:#a7b6d226; --rest:#dce6fa0e; --mint:#9bc9bd35; --glass:.38; --hub:100px;
+  .popover { --surface: #25272b; --ink:#edf0f5; --muted:#9096a1; --hairline:#ffffff15; --plane:#ffffff06; --plane-inner:#ffffff07; --track:#ffffff16; --hand:#e5e8ed; --rest-hand:#70cab2; --work-fill:#8da9d3; --rest-fill:#62bba1; --accent:#a7b6d2; --used:#a7b6d211; --remaining:#a7b6d226; --rest:#dce6fa0e; --mint:#9bc9bd35; --glass:.38; --hub:102px;
     width: 360px; margin: 16px 24px 0 auto; padding: 16px 20px 0; background: var(--surface); color: var(--ink); border: 1px solid var(--hairline); border-radius: 18px; box-shadow: 0 10px 28px #12192318,0 2px 4px #1219230a; position: relative; isolation: isolate; }
   .popover[data-appearance="light"] { --surface:#fafbfd; --ink:#313944; --muted:#858d9a; --hairline:#182f5212; --plane:#5c789906; --plane-inner:#567aaa07; --track:#344d741a; --hand:#4e596b; --rest-hand:#25896f; --work-fill:#718fbd; --rest-fill:#2a9f80; --accent:#687c9d; --used:#758db010; --remaining:#758db020; --rest:#7796c409; --mint:#58a29225; }
+  .popover[data-palette="warm"] { --work-fill:#b6a58d; }
+  .popover[data-palette="warm"][data-appearance="light"] { --work-fill:#a48b69; }
   .popover:before { content: ''; width: 12px; height: 12px; background: var(--surface); position: absolute; right: 41px; top: -7px; transform: rotate(45deg); border-left: 1px solid var(--hairline); border-top: 1px solid var(--hairline); border-radius: 2px 0 0; }
   .toolbar { height: 26px; display: flex; justify-content: flex-end; align-items: center; gap: 8px; position: relative; z-index: 5; }
   .status { margin-right: auto; font-size: 11px; color: var(--muted); }
@@ -39,6 +42,14 @@
   .dial { width: 318px; height: 318px; position: relative; isolation:isolate; margin: 3px auto 10px; user-select: none; touch-action: none; }
   .lap-halo { position:absolute; inset:25px; border-radius:50%; z-index:-1; pointer-events:none; transition:box-shadow .55s ease-out; }
   .face { display: block; width: 100%; height: 100%; overflow: visible; }
+  .grip-glow { opacity:0; transition:opacity .15s ease-out; pointer-events:none; }
+  #work-dot,#rest-dot { transition:r .22s cubic-bezier(.2,.8,.3,1.25),filter .16s; }
+  .dial[data-hover="work"] #work-dot,.dial[data-dragging="work"] #work-dot { r:5.5px; filter:drop-shadow(0 1px 2px #0003); }
+  .dial[data-hover="rest"] #rest-dot,.dial[data-dragging="rest"] #rest-dot { r:5px; filter:drop-shadow(0 1px 2px #0003); }
+  .dial[data-hover="work"] #work-glow,.dial[data-dragging="work"] #work-glow,.dial[data-hover="rest"] #rest-glow,.dial[data-dragging="rest"] #rest-glow { opacity:.14; }
+  .hub[data-editing] { transform:translate(-50%,-50%) scale(.975); }
+  .hub[data-editing="work"] { border-color:color-mix(in srgb,var(--hand) 38%,transparent); }
+  .hub[data-editing="rest"] { border-color:color-mix(in srgb,var(--rest-hand) 48%,transparent); }
   .face .tick { stroke: var(--muted); stroke-width: 1; opacity: .38; }
   .face .major { opacity: .65; }
   .face .tick-label { fill: var(--muted); font-size: 10px; font-weight: 400; font-family: inherit; }
@@ -47,22 +58,26 @@
   .grab-line:active { cursor: grabbing; }
   .handle-hit { position: absolute; width: 30px; height: 30px; border: 0; padding: 0; transform: translate(-50%,-50%); background: transparent; border-radius: 50%; cursor: grab; touch-action: none; }
   .handle-hit:focus-visible { outline: 1.5px solid var(--hand); outline-offset: 0; }
-  .hub { position: absolute; width: var(--hub); height: var(--hub); left:50%; top:50%; transform: translate(-50%,-50%); border-radius:50%; border: 1px solid color-mix(in srgb,var(--ink) calc(7% + var(--glass)*27%),transparent); color:var(--ink); background: color-mix(in srgb,var(--surface) calc(96% - var(--glass)*20%),transparent); backdrop-filter: blur(calc(3px + var(--glass)*14px)); -webkit-backdrop-filter: blur(calc(3px + var(--glass)*14px)); box-shadow: inset 0 1px 0 color-mix(in srgb,var(--ink) calc(var(--glass)*15%),transparent),0 3px 10px #00000012; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px; z-index:3; padding:0; transition:background .15s, box-shadow .15s; }
+  .hub { position: absolute; width: var(--hub); height: var(--hub); left:50%; top:50%; transform: translate(-50%,-50%); border-radius:50%; border: 1px solid color-mix(in srgb,var(--ink) calc(7% + var(--glass)*27%),transparent); color:var(--ink); background: linear-gradient(145deg,color-mix(in srgb,var(--ink) calc(var(--glass)*12%),transparent),transparent 48%,color-mix(in srgb,var(--ink) calc(var(--glass)*4%),transparent)),color-mix(in srgb,var(--surface) calc(93% - var(--glass)*35%),transparent); backdrop-filter: blur(calc(3px + var(--glass)*14px)); -webkit-backdrop-filter: blur(calc(3px + var(--glass)*14px)); box-shadow: inset 0 1px 0 color-mix(in srgb,var(--ink) calc(var(--glass)*15%),transparent),0 3px 10px #00000012; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px; z-index:3; padding:0; transition:background .15s,box-shadow .15s,transform .22s cubic-bezier(.2,.8,.3,1.2),border-color .18s; }
   .hub:hover { box-shadow: inset 0 1px 0 #ffffff20,0 3px 12px #00000014; }
   .hub:active { transform: translate(-50%,-50%) scale(.97); }
   .hub svg { width: 28px; height: 28px; }
   .hub .readout { font-size: 18px; letter-spacing: -.5px; font-weight: 450; font-variant-numeric: tabular-nums; }
-  .editing-label { font-size:12px; letter-spacing:.5px; color:var(--muted); }
-  .hub[data-editing="rest"] .editing-label { color:var(--rest-hand); }
+  .editing-label { font-size:18px; letter-spacing:-.4px; color:var(--hand); font-variant-numeric:tabular-nums; }
   .hub[data-editing] .readout { font-size:18px; letter-spacing:-.4px; }
+  .durations { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; padding:0 1px 16px; font-variant-numeric:tabular-nums; }
+  .duration-item { display:flex; flex-direction:column; gap:4px; align-items:flex-start; min-width:0; }
+  .duration-item span { color:var(--muted); font-size:12px; letter-spacing:.015em; }
+  .duration-item strong { font-size:15px; line-height:20px; font-weight:500; color:var(--ink); white-space:nowrap; }
   .task-row { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px 0 16px; border-top:1px solid var(--hairline); }
-  .task-input { min-width:0; width:65%; color:var(--ink); background:transparent; border:0; border-radius:3px; outline-offset:4px; font-size:13px; padding:0; }
+  .task-input { flex:1; min-width:0; width:65%; color:var(--ink); background:transparent; border:0; border-radius:3px; outline-offset:4px; font-size:13px; padding:0; }
   .task-input::placeholder { color:var(--muted); }
+  .task-actions { display:flex; gap:5px; flex-shrink:0; }
+  .task-action { font-size:11px; line-height:20px; padding:2px 8px; border:1px solid var(--hairline); border-radius:6px; background:transparent; color:var(--muted); }
+  .task-action:hover { background:var(--track); color:var(--ink); }
+  .task-action:disabled { opacity:.4; cursor:default; }
+  .task-row { min-height:56px; }
   .daily { font-size:11px; white-space:nowrap; color:var(--muted); }
-  .settings { position:absolute; right:0; top:33px; width:231px; padding:5px; background:var(--surface); border:1px solid var(--hairline); box-shadow:0 8px 20px #0003; border-radius:10px; z-index:10; }
-  .settings label { display:flex; align-items:center; gap:9px; font-size:12px; padding:9px 7px; border-radius:5px; cursor:pointer; }
-  .settings label:hover { background:var(--plane-inner); }
-  .settings input { accent-color:#7e8eaa; }
   .notification { position:absolute; bottom:21px; right:24px; width:360px; color:#5b6572; font-size:12px; display:flex; align-items:center; gap:8px; padding:10px 13px; background:#f9fafbbf; border:1px solid #d6dce4; border-radius:10px; }
   .notification svg { width:15px; height:15px; flex-shrink:0; }
   .sr { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
@@ -70,46 +85,144 @@
   @media(max-width:800px) { .workspace { display:flex; flex-direction:column-reverse; max-width:640px; padding:24px 16px; gap:24px; } .stage { width:100%; } .controls { width:100%; display:grid; grid-template-columns:1fr 1fr; gap:0 24px; } .controls h1,.controls>.note,.hint { grid-column:1/-1; } .note { margin-bottom:18px; } }
   @media(max-width:420px) { .workspace { padding:12px 0; } .stage { border-radius:0; border-left:0; border-right:0; } .popover { margin:16px auto 0; } .controls { padding:0 20px; } .notification { width:calc(100% - 32px); right:16px; } }
   @media(prefers-reduced-motion:reduce) { *,*:before { transition:none !important; } }
+
+  .timer-page { clip-path:inset(0); transition:transform .26s cubic-bezier(.2,.8,.2,1); }
+  .popover[data-calendar="open"] .timer-page { transform:translateX(14px); pointer-events:none; }
+  .calendar-viewport { position:absolute; inset:0; border-radius:18px; overflow:hidden; pointer-events:none; z-index:12; }
+  .calendar-card { position:absolute; inset:0; z-index:12; border-radius:18px; background:var(--surface); display:flex; flex-direction:column; overflow:hidden; transform:translateX(-100%); visibility:hidden; pointer-events:none; transition:transform .26s cubic-bezier(.2,.8,.2,1),visibility 0s linear .26s; box-shadow:6px 0 18px #00000008; }
+  .popover[data-calendar="open"] .calendar-card { transform:translateX(0); visibility:visible; pointer-events:auto; transition-delay:0s; }
+  .calendar-header { display:grid; grid-template-columns:27px minmax(0,1fr) auto; gap:9px; align-items:start; padding:16px 20px 10px; min-height:54px; flex-shrink:0; }
+  #calendar-close { grid-column:1; grid-row:1; }
+  .calendar-header>div:first-child { grid-column:2; grid-row:1; }
+  .calendar-zoom { display:flex; gap:2px; grid-column:3; grid-row:1; }
+  .calendar-zoom button { font-size:18px; font-weight:300; }
+  .calendar-zoom button:disabled { opacity:.3; cursor:default; }
+  html[data-input="pointer"] #calendar-close:focus-visible,html[data-input="pointer"] #calendar-button:focus-visible { outline:none; }
+  .day-event.compact p { display:none; }
+  .day-event.tiny h3 { visibility:hidden; }
+  .calendar-eyebrow { display:block; max-height:calc(18px * (1 - var(--collapse,0))); overflow:hidden; opacity:calc(1 - var(--collapse,0)); font-size:10px; letter-spacing:1.3px; color:var(--muted); }
+  #calendar-source { letter-spacing:0; }
+  .calendar-header h2 { margin:4px 0 0; font-size:calc(22px - var(--collapse,0)*6px); font-weight:500; letter-spacing:-.5px; }
+  .calendar-totals { display:flex; gap:22px; padding:0 20px calc(16px * (1 - var(--collapse,0))); max-height:calc(34px * (1 - var(--collapse,0))); opacity:calc(1 - var(--collapse,0)); overflow:hidden; flex-shrink:0; font-size:11px; color:var(--muted); border-bottom:1px solid var(--hairline); }
+  .calendar-totals span { display:flex; align-items:center; gap:6px; }
+  .calendar-totals strong { color:var(--ink); font-weight:500; font-variant-numeric:tabular-nums; }
+  .calendar-totals i { width:5px; height:5px; border-radius:50%; background:var(--work-fill); }
+  .calendar-totals .rest-total i { background:var(--rest-fill); }
+  .calendar-scroll { overflow-anchor:none; flex:1; min-height:0; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:var(--track) transparent; padding:16px 17px 12px 12px; }
+  .day-track { position:relative; height:2880px; }
+  .hour { position:absolute; left:0; right:0; height:1px; margin-left:43px; background:var(--hairline); }
+  .hour span { white-space:nowrap; position:absolute; right:calc(100% + 9px); top:-8px; font-size:10px; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .day-event { position:absolute; left:48px; right:3px; border-radius:5px; padding:5px 9px; border-left:2px solid var(--work-fill); background:color-mix(in srgb,var(--work-fill) 23%,var(--surface)); overflow:hidden; color:var(--ink); }
+  .day-event.rest-event { border-color:var(--rest-fill); background:color-mix(in srgb,var(--rest-fill) 21%,var(--surface)); }
+  .day-event h3 { font-size:12px; line-height:17px; font-weight:500; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .day-event p { font-size:10px; line-height:15px; margin:1px 0 0; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .day-event.compact { padding:0 8px; }
+  .day-event.compact h3 { font-size:10px; line-height:14px; }
+  .day-empty { position:sticky; top:60px; padding:18px 0 0 58px; color:var(--muted); font-size:12px; }
+
+@media(prefers-reduced-motion:reduce) { .timer-page,.calendar-card { transition:none; } }
+/* Explicit design-preview override only; never changes OS accessibility settings. */
+  html[data-transition-preview="true"] .timer-page { transition:transform .26s cubic-bezier(.2,.8,.2,1) !important; }
+  html[data-transition-preview="true"] .calendar-card { transition:transform .26s cubic-bezier(.2,.8,.2,1),visibility 0s linear .26s !important; }
+  html[data-transition-preview="true"] .popover[data-calendar="open"] .calendar-card { transition-delay:0s !important; }
+
+  .settings-card { position:absolute; inset:0; border-radius:18px; overflow:hidden; background:var(--surface); color:var(--ink); display:flex; flex-direction:column; transform:translateX(100%); visibility:hidden; pointer-events:none; transition:transform .26s cubic-bezier(.2,.8,.2,1),visibility 0s linear .26s; }
+  .popover[data-settings="open"] .settings-card { transform:translateX(0); visibility:visible; pointer-events:auto; transition-delay:0s; }
+  .popover[data-settings="open"] .timer-page { transform:translateX(-14px); pointer-events:none; }
+  .settings-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px 12px; }
+  .settings-header h2 { font-size:20px; line-height:27px; font-weight:500; letter-spacing:-.5px; margin:0; }
+  .settings-body { padding:0 20px 24px; overflow-y:auto; scrollbar-width:thin; }
+  .settings-body h3 { color:var(--muted); font-size:11px; font-weight:500; margin:17px 0 8px; }
+  .settings-group { border:1px solid var(--hairline); border-radius:10px; background:var(--plane); padding:0 12px; }
+  .setting-row { min-height:49px; display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:12px; }
+  .setting-row + .setting-row { border-top:1px solid var(--hairline); }
+  .setting-row input[role="switch"] { appearance:none; width:30px; height:18px; border:1px solid var(--track); border-radius:10px; background:var(--track); cursor:pointer; margin:0; flex-shrink:0; position:relative; transition:background .16s; }
+  .setting-row input[role="switch"]:before { content:''; position:absolute; width:14px; height:14px; top:1px; left:1px; border-radius:50%; background:#f8f9fb; box-shadow:0 1px 2px #0002; transition:transform .16s; }
+  .setting-row input[role="switch"]:checked { background:#678eb7; border-color:#678eb7; }
+  .setting-row input[role="switch"]:checked:before { transform:translateX(12px); }
+  .setting-stack { flex-direction:column; align-items:stretch; padding:12px 0; gap:10px; }
+  .theme-picker { display:flex; gap:3px; background:var(--plane-inner); padding:3px; border-radius:7px; }
+  .theme-picker button { flex:1; border:0; border-radius:5px; padding:5px; background:transparent; color:var(--muted); font-size:11px; }
+  .theme-picker button[aria-pressed="true"] { background:var(--track); color:var(--ink); }
+  .setting-row select { max-width:140px; border:0; background:transparent; color:var(--ink); font-size:12px; text-align:right; cursor:pointer; }
+  .setting-row select option { background:var(--surface); color:var(--ink); }
+  html[data-input="pointer"] #settings-close:focus-visible,html[data-input="pointer"] #settings-button:focus-visible { outline:none; }
+  html[data-transition-preview="true"] .settings-card { transition:transform .26s cubic-bezier(.2,.8,.2,1),visibility 0s linear .26s !important; }
+  html[data-transition-preview="true"] .popover[data-settings="open"] .settings-card { transition-delay:0s !important; }
 </style>
 <main class="workspace">
-  <aside class="controls" aria-label="预览控制，不属于产品界面">
-    <h1>表盘预览</h1><p class="note">局部交互样机 · 数据不保存<br>拖动一长一短两根线，点击中央按钮。</p>
-    <div class="control"><span class="control-title">预览状态</span><div class="segmented" id="phase-options"><button data-phase="ready" aria-pressed="true">准备</button><button data-phase="work" aria-pressed="false">工作</button><button data-phase="rest" aria-pressed="false">休息</button></div><label class="check"><input id="fast" type="checkbox">60 倍速观察动效</label></div>
-    <div class="control"><span class="control-title">外观</span><div class="segmented" id="appearance-options"><button data-appearance="dark" aria-pressed="true">深色</button><button data-appearance="light" aria-pressed="false">浅色</button></div></div>
-    <div class="control"><label for="hub-size">中央按钮<output id="hub-output">100 pt</output></label><input id="hub-size" type="range" min="88" max="116" value="100" step="2"></div>
-    <div class="control"><label for="glass">玻璃感<output id="glass-output">轻</output></label><input id="glass" type="range" min="0" max="100" value="38"></div>
-    <p class="hint">按 Tab 可选中拨杆，方向键微调分钟。<br>工作／暂停时都可修改；已用时间保留。<br>玻璃为浏览器近似，选定后再适配 SwiftUI。</p>
+  <aside class="controls" aria-label="Preview controls, not part of the app">
+    <h1>Dial preview</h1><p class="note">Interactive prototype · Data is not saved<br>Drag either hand. Click the center to start.</p>
+    <div class="control"><span class="control-title">Preview state</span><div class="segmented" id="phase-options"><button data-phase="ready" aria-pressed="true">Ready</button><button data-phase="work" aria-pressed="false">Work</button><button data-phase="rest" aria-pressed="false">Rest</button></div><label class="check"><input id="fast" type="checkbox">Preview at 60× speed</label></div>
+    <label class="check" style="margin-bottom:22px"><input id="transition-preview" type="checkbox" checked>Preview transitions</label>
+    <label class="check" style="margin-bottom:22px"><input id="calendar-demo" type="checkbox" checked>Sample calendar entries · Demo only</label>
+    <div class="control"><label for="sample">Sample duration</label><select id="sample"><option value="50">50 minutes</option><option value="1">1 minute</option><option value="60">1 hour</option><option value="120">2 hours</option><option value="180">3 hours · Unlimited</option><option value="240">4 hours · Unlimited</option></select></div>
+    <div class="control"><label for="guides">Dial guides</label><select id="guides"><option value="none">None</option><option value="radial">Radial guides</option></select></div>
+    <div class="control"><label for="hub-size">Center button<output id="hub-output">102 pt</output></label><input id="hub-size" type="range" min="88" max="116" value="102" step="2"></div>
+    <div class="control"><label for="glass">Glass effect<output id="glass-output">Subtle</output></label><input id="glass" type="range" min="0" max="100" value="38"></div>
+    <p class="hint">Tab to a hand; use arrow keys to adjust minutes.<br>Adjust while running or paused; elapsed time is kept.<br>Glass is a browser approximation for this preview.</p>
   </aside>
-  <section class="stage" aria-label="Mac 菜单栏弹窗预览">
-    <div class="menubar"><button class="menu-trigger" id="menu-trigger" aria-label="展开或收起计时器" aria-expanded="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="13" r="8"/><path d="M9 2h6M12 5V2m0 6v5l3 2"/></svg><span id="menu-time">50:00</span></button></div>
+  <section class="stage" aria-label="Mac menu bar popover preview">
+    <div class="menubar"><button class="menu-trigger" id="menu-trigger" aria-label="Show or hide timer" aria-expanded="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="13" r="8"/><path d="M9 2h6M12 5V2m0 6v5l3 2"/></svg><span id="menu-time">50:00</span></button></div>
     <div class="popover" id="popover" data-appearance="dark">
-      <div class="toolbar"><span id="status" class="status" aria-live="polite"></span><button class="icon-button" id="reset" title="重置本轮，保留累计" aria-label="重置本轮"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7a8 8 0 1 1-1 9M5 2v5h5"/></svg></button><button class="icon-button" id="settings-button" aria-label="设置" aria-expanded="false" title="设置"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg></button><div class="settings" id="settings" hidden><label><input type="checkbox" id="sound" checked>提示音</label><label><input type="checkbox" id="auto" checked>休息后自动开始工作</label></div></div>
+      <div id="timer-page" class="timer-page"><div class="toolbar"><button class="icon-button" id="calendar-button" aria-label="Today’s records" aria-expanded="false" aria-controls="calendar-card" title="Today’s records"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M8 3v4m8-4v4M4 10h16m-12 4h2m4 0h2m-8 3h2"/></svg></button><span id="status" class="status" aria-live="polite"></span><button class="icon-button" id="reset" title="Reset cycle, keep recorded time" aria-label="Reset cycle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7a8 8 0 1 1-1 9M5 2v5h5"/></svg></button><button class="icon-button" id="settings-button" aria-label="Settings" aria-controls="settings-card" aria-expanded="false" title="Settings"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg></button></div>
       <div class="dial" id="dial">
         <div class="lap-halo" id="lap-halo"></div>
         <svg class="face" viewBox="0 0 320 320" aria-hidden="true">
+          <defs>
+            <radialGradient id="work-gradient" cx="138" cy="119" r="185" gradientUnits="userSpaceOnUse"><stop stop-color="var(--work-fill)" stop-opacity=".48"/><stop offset=".7" stop-color="var(--work-fill)" stop-opacity=".85"/><stop offset="1" stop-color="var(--work-fill)"/></radialGradient>
+            <radialGradient id="rest-gradient" cx="138" cy="119" r="160" gradientUnits="userSpaceOnUse"><stop stop-color="var(--rest-fill)" stop-opacity=".6"/><stop offset="1" stop-color="var(--rest-fill)"/></radialGradient>
+          </defs>
           <circle cx="160" cy="160" r="134" fill="var(--plane)" stroke="var(--track)" stroke-width="1"/>
-          <g id="sectors"><g id="work-used" fill="var(--work-fill)"/><g id="work-left" fill="var(--work-fill)"/><g id="rest-base" fill="var(--rest-fill)"/><g id="rest-used" fill="var(--rest-fill)"/></g>
-          <circle cx="160" cy="160" r="104" fill="var(--plane-inner)" stroke="var(--track)" stroke-width="1"/>
-          <g id="ticks"></g>
+          <g id="sectors"><g id="work-used" fill="url(#work-gradient)"/><g id="work-left" fill="url(#work-gradient)"/><g id="rest-base" fill="url(#rest-gradient)"/><g id="rest-used" fill="url(#rest-gradient)"/></g>
+          <circle cx="160" cy="160" r="105.3" fill="var(--plane-inner)" stroke="var(--track)" stroke-width="1"/>
+          <g id="ticks" hidden></g>
 
           <line id="work-line" class="hand-line" x1="160" y1="160" stroke="var(--hand)" stroke-width="2"/>
           <line id="rest-line" class="hand-line" x1="160" y1="160" stroke="var(--rest-hand)" stroke-width="2"/>
+          <circle id="work-glow" class="grip-glow" r="12" fill="var(--hand)"/>
+          <circle id="rest-glow" class="grip-glow" r="11" fill="var(--rest-hand)"/>
           <circle id="work-dot" r="4" fill="var(--hand)" pointer-events="none"/>
           <circle id="rest-dot" r="3.5" fill="var(--rest-hand)" pointer-events="none"/>
           <line id="work-grab" class="grab-line" data-kind="work"/>
           <line id="rest-grab" class="grab-line" data-kind="rest"/>
         </svg>
-        <button class="handle-hit" id="work-handle" data-kind="work" aria-label="工作时长" title="拖动调整工作时长"></button>
-        <button class="handle-hit" id="rest-handle" data-kind="rest" aria-label="休息时长" title="拖动调整休息时长"></button>
-        <button id="play" class="hub" aria-label="开始计时"><svg id="play-icon" viewBox="0 0 28 28" fill="currentColor"><path d="M10 6.5 22 14 10 21.5Z"/></svg><span id="editing-label" class="editing-label" hidden></span><span id="time" class="readout">50:00</span></button>
+        <button class="handle-hit" id="work-handle" data-kind="work" aria-label="Work duration" title="Drag to adjust work duration"></button>
+        <button class="handle-hit" id="rest-handle" data-kind="rest" aria-label="Rest duration" title="Drag to adjust cycle duration"></button>
+        <button id="play" class="hub" aria-label="Start timer"><svg id="play-icon" viewBox="0 0 28 28" fill="currentColor"><path d="M10 6.5 22 14 10 21.5Z"/></svg><span id="editing-label" class="editing-label" hidden></span><span id="time" class="readout">50:00</span></button>
       </div>
-      <div class="task-row"><label for="task" class="sr">当前任务</label><input id="task" class="task-input" type="text" placeholder="在做什么？" value="阅读" maxlength="80"><span id="daily" class="daily">今日 0m</span></div>
+      <div class="durations" aria-label="Cycle durations"><div class="duration-item"><span>Work</span><strong id="work-summary">50m</strong></div><div class="duration-item"><span>Rest</span><strong id="rest-summary">10m</strong></div><div class="duration-item"><span>Cycle</span><strong id="cycle-summary">1h</strong></div></div>
+      <div class="task-row"><label for="task" class="sr">Current task</label><input id="task" class="task-input" type="text" placeholder="What are you working on?" value="Reading" maxlength="80"><span id="daily" class="daily">Today 0m</span><div id="task-actions" class="task-actions" hidden><button id="task-continue" class="task-action" title="Continue this record">Continue</button><button id="task-new" class="task-action" title="Start a new record">New</button></div></div>
+      </div>
+      <div class="calendar-viewport"><section id="calendar-card" class="calendar-card" aria-label="Today’s timeline" inert aria-hidden="true">
+        <header class="calendar-header"><div><span class="calendar-eyebrow">TODAY <span id="calendar-source">· Sample entries</span></span><h2 id="calendar-date"></h2></div><button id="calendar-close" class="icon-button" aria-label="Back to timer" title="Back to timer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m14 6-6 6 6 6"/></svg></button><div class="calendar-zoom" role="group" aria-label="Timeline density"><button id="zoom-out" class="icon-button" aria-label="Zoom out" title="More compact">−</button><button id="zoom-in" class="icon-button" aria-label="Zoom in" title="More spacious">+</button></div></header>
+        <div class="calendar-totals"><span><i></i>Work <strong id="calendar-work"></strong></span><span class="rest-total"><i></i>Rest <strong id="calendar-rest"></strong></span></div>
+        <div id="calendar-scroll" class="calendar-scroll" tabindex="0" aria-label="Read-only timeline"><div id="day-track" class="day-track"></div></div>
+      </section></div>
+      <div class="calendar-viewport"><section id="settings-card" class="settings-card" aria-label="Timer settings" inert aria-hidden="true">
+        <header class="settings-header"><h2>Settings</h2><button id="settings-close" class="icon-button" aria-label="Back to timer" title="Back to timer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m10 6 6 6-6 6"/></svg></button></header>
+        <div class="settings-body">
+          <h3>Timer</h3>
+          <div class="settings-group">
+            <label class="setting-row" for="sound"><span>Sound</span><input role="switch" type="checkbox" id="sound" checked></label>
+            <label class="setting-row" for="auto"><span>Auto-start next cycle</span><input role="switch" type="checkbox" id="auto" checked></label>
+            <label class="setting-row" for="limit"><span>2h limit per phase</span><input role="switch" type="checkbox" id="limit" checked></label>
+          </div>
+          <h3>Appearance</h3>
+          <div class="settings-group">
+            <div class="setting-row setting-stack"><span id="appearance-label">Theme</span><div class="theme-picker" role="group" aria-labelledby="appearance-label"><button data-theme="system" aria-pressed="true">System</button><button data-theme="light" aria-pressed="false">Light</button><button data-theme="dark" aria-pressed="false">Dark</button></div></div>
+            <label class="setting-row" for="palette"><span>Work color</span><select id="palette"><option value="blue">Blue gray</option><option value="warm">Warm gray</option></select></label>
+          </div>
+        </div>
+      </section></div>
     </div>
     <div id="notification" class="notification" role="status" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 17h14l-2-4V9a5 5 0 0 0-10 0v4zm5 3h4"/></svg><span></span></div>
   </section>
 </main>
 <script type="module">
-import { DialModel, angularDelta } from './model.mjs';
+import { DialModel } from './model.mjs';
+import { DialDrag } from './drag.mjs';
+import { pickHand } from './selection.mjs';
 import { point, layers } from './geometry.mjs';
 const model = new DialModel();
 const $ = id => document.getElementById(id);
@@ -122,18 +235,23 @@ function paint(id,start,span,radius,opacity) {
   paintCache.set(id,key);
   $(id).innerHTML=`<path d="${parts.full}" opacity="${parts.opacity}"/><path d="${parts.tail}" opacity="${parts.tailOpacity}"/>`;
 }
-for(let i=0;i<60;i++) {
-  if(i%5!==0 && i%2!==0) continue;
-  const a=point(i,134),b=point(i,i%15===0?128:i%5===0?130:132);
+for(const minute of [0,15,30,45]) {
+  const a=point(minute,62),b=point(minute,119),labelAt=point(minute,128);
   const line=document.createElementNS(ns,'line');
-  ['x1','y1','x2','y2'].forEach((k,j)=>line.setAttribute(k,[...a,...b][j]));
-  line.setAttribute('class',i%15===0?'tick major':'tick'); $('ticks').append(line);
+  ['x1','y1','x2','y2'].forEach((key,j)=>line.setAttribute(key,[...a,...b][j]));
+  line.setAttribute('stroke','var(--muted)');line.setAttribute('opacity','.14');line.setAttribute('stroke-width','.75');
+  line.setAttribute('stroke-dasharray','2 5');$('ticks').append(line);
+  const label=document.createElementNS(ns,'text');label.textContent=minute;
+  label.setAttribute('x',labelAt[0]);label.setAttribute('y',labelAt[1]);label.setAttribute('class','tick-label');
+  label.setAttribute('text-anchor','middle');label.setAttribute('dominant-baseline','central');label.setAttribute('opacity','.65');
+  $('ticks').append(label);
 }
+let visualWork=model.work,visualEnd=model.work+model.rest,lastPaint=performance.now();
 let drag=null, editingKind=null, noticeTimer=0, previous=performance.now(), audio;
 let lastPhase=model.phase;
 function clock(s) { const n=Math.max(0,Math.ceil(s));return `${String(Math.floor(n/60)).padStart(2,'0')}:${String(n%60).padStart(2,'0')}`; }
-function showTip(kind) { editingKind=kind; render(); }
-function hideTip() { editingKind=null; render(); }
+function showTip(kind) { editingKind=kind;if(drag)$('dial').dataset.dragging=kind;render(); }
+function hideTip() { editingKind=null;delete $('dial').dataset.dragging;delete $('dial').dataset.hover;render(); }
 function durationLabel(minutes) {
   const hours=Math.floor(minutes/60), remainder=minutes%60;
   return hours ? `${hours}h${remainder ? ` ${remainder}m` : ''}` : `${minutes} min`;
@@ -148,73 +266,282 @@ function chime() {
 }
 function unlockAudio(){ try{audio??=new AudioContext();audio.resume();}catch{} }
 function render() {
-  const w=model.work,r=model.rest, active=model.phase;
+  const active=model.phase;
+  const rawWork=drag?.kind==='work'?drag.motion.value:drag?Math.min(model.work,drag.end-model.minimum('rest')):model.work;
+  const rawEnd=drag ? drag.end : model.cycle;
+  const now=performance.now(),dt=Math.max(0,now-lastPaint);lastPaint=now;
+  const alpha=drag||matchMedia('(prefers-reduced-motion: reduce)').matches?1:1-Math.exp(-dt/38);
+  visualWork+=(rawWork-visualWork)*alpha;visualEnd+=(rawEnd-visualEnd)*alpha;
+  if(Math.abs(rawWork-visualWork)<.001)visualWork=rawWork;
+  if(Math.abs(rawEnd-visualEnd)<.001)visualEnd=rawEnd;
+  const w=visualWork,r=Math.max(0,visualEnd-visualWork);
   const workElapsed=active==='work'?model.elapsed/60:(active==='rest'||active==='waiting'?w:0);
-  paint('work-used',0,workElapsed,134,.075);
-  paint('work-left',workElapsed,w-workElapsed,134,.25);
+  paint('work-used',0,workElapsed,105.3,.075);
+  paint('work-left',workElapsed,w-workElapsed,105.3,.42);
   // Both rest layers share the same start as the long hand, including when
   // crossing twelve o'clock. The entire session stays visibly mint.
-  paint('rest-base',w,r,104,.25);
-  const restElapsed=active==='rest'?model.elapsed/60:active==='waiting'?r:0;
-  paint('rest-used',w,restElapsed,104,.24);
+  const light=$('popover').dataset.appearance==='light';
+  const restElapsed=active==='rest'?Math.min(r,(model.duration>0?model.elapsed/model.duration*r:0)):active==='waiting'?r:0;
+  paint('rest-base',light?w+restElapsed:w,light?r-restElapsed:r,134,.39);
+  paint('rest-used',w,restElapsed,134,light?.075:.24);
   $('sectors').style.opacity=!model.running && active!=='ready'?.86:1;
   const remainingMinutes=active==='rest'?r-restElapsed:w-workElapsed;
   const depth=Math.max(0,remainingMinutes/60-1);
   const spread=Math.min(16,6*Math.log2(1+depth));
   const strength=Math.min(.17,.045*Math.log2(1+depth));
-  $('lap-halo').style.boxShadow=depth>0?`0 0 ${10+spread}px ${spread}px rgb(100 132 175 / ${strength})`:'0 0 0 0 rgb(100 132 175 / 0)';
+  $('lap-halo').style.boxShadow=depth>0?`0 0 ${10+spread}px ${spread}px color-mix(in srgb,var(--work-fill) ${strength*100}%,transparent)`:'0 0 0 0 rgb(100 132 175 / 0)';
   for(const kind of ['work','rest']) {
-    const minutes=kind==='work'?w:w+r, radius=kind==='work'?134:104;
-    const end=point(minutes,radius),start=point(minutes,48);
+    const minutes=kind==='work'?w:w+r, radius=kind==='work'?105.3:134;
+    const end=point(minutes,radius),start=point(minutes,kind==='rest'&&r<.4?113:48);
     const line=$(kind+'-line'),hit=$(kind+'-grab'),button=$(kind+'-handle');
+    line.setAttribute('x1',start[0]);line.setAttribute('y1',start[1]);
     line.setAttribute('x2',end[0]);line.setAttribute('y2',end[1]);
     $(kind+'-dot').setAttribute('cx',end[0]);$(kind+'-dot').setAttribute('cy',end[1]);
+    $(kind+'-glow').setAttribute('cx',end[0]);$(kind+'-glow').setAttribute('cy',end[1]);
     ['x1','y1','x2','y2'].forEach((k,j)=>hit.setAttribute(k,[...start,...end][j]));
     button.style.left=`${end[0]/320*100}%`;button.style.top=`${end[1]/320*100}%`;
-    button.setAttribute('aria-label',`${kind==='work'?'工作':'休息'} ${model[kind]} 分钟，方向键调整`);
+    button.setAttribute('aria-label',`${kind==='work'?'Work':'Cycle'} ${kind==='work'?model.work:model.cycle} minutes; use arrow keys to adjust`);
   }
-  $('time').textContent=editingKind?durationLabel(model[editingKind]):clock(model.remaining);
+  $('time').textContent=editingKind?durationLabel(model.rest).replace(' min','m'):clock(model.remaining);
+  $('time').style.color=editingKind?'var(--rest-hand)':'';
+  $('time').setAttribute('aria-label',editingKind?`Rest ${model.rest} minutes`:'Time remaining');
   $('play-icon').toggleAttribute('hidden',Boolean(editingKind));
   $('editing-label').hidden=!editingKind;
-  $('editing-label').textContent=editingKind==='work'?'Work':'Rest';
+  $('editing-label').textContent=durationLabel(model.work).replace(' min','m');
+  $('editing-label').setAttribute('aria-label',`Work ${model.work} minutes`);
   if(editingKind)$('play').dataset.editing=editingKind;else delete $('play').dataset.editing;
-  $('menu-time').textContent=active==='waiting'?'待开始':clock(model.remaining);
+  $('work-summary').textContent=durationLabel(model.work).replace(' min','m');
+  $('rest-summary').textContent=durationLabel(model.rest).replace(' min','m');
+  $('cycle-summary').textContent=durationLabel(model.cycle).replace(' min','m');
+  $('menu-time').textContent=active==='waiting'?'Ready to start':clock(model.remaining);
   $('play-icon').innerHTML=model.running?'<rect x="8" y="6" width="4" height="16" rx="1"/><rect x="17" y="6" width="4" height="16" rx="1"/>':'<path d="M10 6.5 22 14 10 21.5Z"/>';
-  $('play').setAttribute('aria-label',model.running?'暂停计时':'开始或继续计时');
-  const status=active==='waiting'?'待开始':!model.running&&active!=='ready'?(active==='rest'?'休息已暂停':'已暂停'):'';
+  $('play').disabled=model.cycle===0;
+  $('play').setAttribute('aria-label',model.running?'Pause timer':'Start or resume timer');
+  const status=active==='waiting'?'Ready to start':!model.running&&active!=='ready'?(active==='rest'?'Rest paused':'Paused'):'';
   if($('status').textContent!==status)$('status').textContent=status;
-  const total=Math.floor(model.total/60);$('daily').textContent=`今日 ${total>=60?`${Math.floor(total/60)}h `:''}${total%60}m`;
+  const total=Math.floor(model.total/60);$('daily').textContent=`Today ${total>=60?`${Math.floor(total/60)}h `:''}${total%60}m`;
   if(lastPhase!==active){lastPhase=active;document.querySelectorAll('[data-phase]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.phase===active)));}
 }
 function settle(now=performance.now()) {
   const delta=(now-previous)/1000; previous=now;
-  if(delta>5&&model.running){model.running=false;notify('预览已暂停，点击继续');}
+  if(delta>5&&model.running){model.running=false;notify('Preview paused. Click to resume.');}
   else for(const event of model.advance(delta*($('fast').checked?60:1))) {notify(event,model.phase==='waiting');chime();}
 }
 function loop(now){settle(now);render();requestAnimationFrame(loop);}
-function rawAngle(e){const rect=$('dial').getBoundingClientRect();return Math.atan2(e.clientY-rect.top-rect.height/2,e.clientX-rect.left-rect.width/2)*180/Math.PI+90;}
-document.querySelectorAll('[data-kind]').forEach(el=> {
-  el.addEventListener('pointerdown',e=> {e.preventDefault();settle();const kind=el.dataset.kind;drag={kind,pointer:e.pointerId,last:rawAngle(e),minutes:model[kind]};el.setPointerCapture(e.pointerId);showTip(kind);});
-  el.addEventListener('pointermove',e=> {if(!drag||drag.kind!==el.dataset.kind||drag.pointer!==e.pointerId)return;if(!(e.buttons&1)){drag=null;hideTip();return;}settle();const angle=rawAngle(e);drag.minutes+=angularDelta(drag.last,angle)/6;drag.last=angle;drag.minutes=Math.max(model.minimum(drag.kind),drag.minutes);model.setMinutes(drag.kind,drag.minutes);showTip(drag.kind);render();});
-  const end=()=>{if(drag){drag=null;hideTip();}};
-  el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end);el.addEventListener('lostpointercapture',end);
+function pointerPosition(e) {
+  const rect=$('dial').getBoundingClientRect(),x=e.clientX-rect.left-rect.width/2,y=e.clientY-rect.top-rect.height/2;
+  return {angle:Math.atan2(y,x)*180/Math.PI+90,radius:Math.hypot(x,y),startRadius:$('play').getBoundingClientRect().width/2};
+}
+function moveHand(e) {
+  const kind=drag.kind;
+  const minutes=drag.motion.move({...pointerPosition(e),min:kind==='rest'?model.cycleMinimum():model.minimum(kind),max:model.maximum(kind)+(kind==='rest'?model.work:0)});
+  drag.end=kind==='rest'?minutes:minutes+drag.rest;
+  if(kind==='rest')model.setCycle(minutes);else model.setMinutes(kind,minutes);
+  showTip(kind);
+}
+function candidate(e) {
+  const rect=$('dial').getBoundingClientRect();
+  return pickHand((e.clientX-rect.left)*320/rect.width,(e.clientY-rect.top)*320/rect.height,visualWork,visualEnd,Number($('hub-size').value)/2*320/rect.width);
+}
+$('dial').addEventListener('pointerdown',e=>{
+  if(e.button!==0||drag)return;
+  const kind=candidate(e);if(!kind)return;
+  e.preventDefault();settle();
+  drag={kind,pointer:e.pointerId,end:model.cycle,rest:model.rest,motion:new DialDrag(kind==='rest'?model.cycle:model.work)};
+  $('dial').setPointerCapture(e.pointerId);showTip(kind);
+});
+$('dial').addEventListener('pointermove',e=>{
+  if(drag){
+    if(drag.pointer!==e.pointerId)return;
+    if(!(e.buttons&1)){drag=null;hideTip();return;}
+    settle();moveHand(e);
+  }else{
+    const kind=candidate(e);if(kind)$('dial').dataset.hover=kind;else delete $('dial').dataset.hover;
+  }
+});
+for(const event of ['pointerup','pointercancel','lostpointercapture'])$('dial').addEventListener(event,()=>{if(drag){drag=null;hideTip();}});
+$('dial').addEventListener('pointerleave',()=>{if(!drag)delete $('dial').dataset.hover;});
+document.querySelectorAll('.handle-hit').forEach(el=> {
   el.addEventListener('blur',()=>{if(!drag)hideTip();});
   el.addEventListener('keyup',()=>{if(!drag)hideTip();});
-  el.addEventListener('keydown',e=> {if(!['ArrowUp','ArrowRight','ArrowDown','ArrowLeft'].includes(e.key))return;e.preventDefault();settle();model.setMinutes(el.dataset.kind,model[el.dataset.kind]+(['ArrowUp','ArrowRight'].includes(e.key)?1:-1)*(e.shiftKey?5:1));showTip(el.dataset.kind);render();});
+  el.addEventListener('keydown',e=> {
+    if(!['ArrowUp','ArrowRight','ArrowDown','ArrowLeft'].includes(e.key))return;
+    e.preventDefault();settle();const kind=el.dataset.kind;
+    const step=(['ArrowUp','ArrowRight'].includes(e.key)?1:-1)*(e.shiftKey?5:1);
+    if(kind==='rest')model.setCycle(model.cycle+step);else model.setMinutes(kind,model.work+step);
+    showTip(kind);
+  });
 });
 window.addEventListener('blur',()=>{drag=null;hideTip();});
+// Disposable interaction model only. Persistence and time-segment storage belong
+// to the next recording implementation, not this visual prototype.
+let taskName=$('task').value,taskEditing=false;
+const taskGroups=[{names:[taskName]}];
+function beginTaskEdit(){taskEditing=true;$('daily').hidden=true;$('task-actions').hidden=false;validateTask();}
+function validateTask(){for(const id of ['task-continue','task-new'])$(id).disabled=!$('task').value.trim();}
+function endTaskEdit(){taskEditing=false;$('task').value=taskName;$('daily').hidden=false;$('task-actions').hidden=true;$('task').blur();}
+function commitTask(isNew){
+  const name=$('task').value.trim();if(!name)return;
+  settle();taskName=name;
+  if(isNew)taskGroups.push({names:[name]});
+  else {const names=taskGroups.at(-1).names;if(names.at(-1)!==name)names.push(name);}
+  endTaskEdit();notify(isNew?'New record started':'Continuing this record');render();
+}
+$('task').addEventListener('focus',beginTaskEdit);
+$('task').addEventListener('input',validateTask);
+$('task').addEventListener('keydown',e=>{
+  if(e.isComposing)return;
+  if(e.key==='Enter'){e.preventDefault();commitTask(false);}
+  else if(e.key==='Escape'){e.preventDefault();endTaskEdit();}
+});
+$('task-continue').onclick=()=>commitTask(false);
+$('task-new').onclick=()=>commitTask(true);
+// Clicking elsewhere cancels an unconfirmed draft; never commits a partial name.
+document.addEventListener('pointerdown',e=>{if(taskEditing&&!e.target.closest('.task-row'))endTaskEdit();});
+const demoEntries=[
+  [540,590,'work','Reading · The Design of Everyday Things'],[590,600,'rest','Rest'],
+  [600,645,'work','Reading · Design + Interaction'],[645,655,'rest','Rest'],
+  [675,720,'work','Reading notes'],[720,730,'rest','Rest'],
+  [840,890,'work','Work Rest Timer'],[890,905,'rest','Rest'],
+  [905,945,'work','Refining the timeline']
+];
+let calendarOrigin=0,calendarScale=2,zoomTarget=2,zoomFrame=0,zooming=false,zoomAnchor=0,zoomY=0;
+function renderCalendar(){
+  const today=new Date();
+  $('calendar-date').textContent=new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric'}).format(today)+' · '+new Intl.DateTimeFormat('en-US',{weekday:'short'}).format(today);
+  const entries=$('calendar-demo').checked?demoEntries:[];
+  $('calendar-source').textContent=entries.length?'· Sample entries':'· No saved records';
+  const track=$('day-track');track.replaceChildren();
+  for(let h=0;h<24;h++){
+    const line=document.createElement('div');line.className='hour';line.dataset.minute=h*60;line.style.top=`${h*60*calendarScale}px`;
+    const label=document.createElement('span');label.textContent=`${h%12||12} ${h<12?'AM':'PM'}`;line.append(label);track.append(line);
+  }
+  const stamp=m=>`${Math.floor(m/60)%12||12}:${String(m%60).padStart(2,'0')} ${m<720?'AM':'PM'}`;
+  for(const [start,end,kind,name] of entries){
+    const event=document.createElement('article'),short=end-start<20;
+    event.className=`day-event ${kind==='rest'?'rest-event':''} ${short?'compact':''}`;
+    event.dataset.start=start;event.dataset.end=end;event.style.top=`${start*calendarScale}px`;event.style.height=`${(end-start)*calendarScale-2}px`;
+    event.title=`${name} · ${stamp(start)}–${stamp(end)} · ${end-start}m`;
+    event.setAttribute('aria-label',`${event.title} · ${kind==='rest'?'Rest':'Work'}`);
+    const title=document.createElement('h3');title.textContent=short?`${name} · ${end-start}m`:name;event.append(title);
+    {const detail=document.createElement('p');detail.textContent=`${stamp(start)}–${stamp(end)} · ${end-start}m`;event.append(detail);}
+    track.append(event);
+  }
+  if(!entries.length){const empty=document.createElement('p');empty.className='day-empty';empty.textContent='No saved records today';track.append(empty);}
+  for(const kind of ['work','rest'])$('calendar-'+kind).textContent=durationLabel(entries.filter(e=>e[2]===kind).reduce((sum,e)=>sum+e[1]-e[0],0)).replace(' min','m');
+  $('calendar-card').style.setProperty('--collapse','0');
+  layoutCalendar();
+  calendarOrigin=entries.length?entries[0][0]*calendarScale-24:Math.max(0,today.getHours()*60*calendarScale-24);
+  $('calendar-scroll').scrollTop=calendarOrigin;
+}
+function toggleCalendar(open){
+  cancelAnimationFrame(zoomFrame);zoomFrame=0;zooming=false;zoomTarget=calendarScale;
+  if(open){endTaskEdit();renderCalendar();}
+  $('popover').dataset.calendar=open?'open':'closed';
+  $('calendar-button').setAttribute('aria-expanded',String(open));
+  $('calendar-card').inert=!open;$('calendar-card').setAttribute('aria-hidden',String(!open));
+  $('timer-page').inert=open;$('timer-page').setAttribute('aria-hidden',String(open));
+  (open?$('calendar-close'):$('calendar-button')).focus({preventScroll:true});
+}
+function layoutCalendar(){
+  $('day-track').style.height=`${1440*calendarScale}px`;
+  for(const line of $('day-track').querySelectorAll('.hour'))line.style.top=`${Number(line.dataset.minute)*calendarScale}px`;
+  for(const event of $('day-track').querySelectorAll('.day-event')){
+    const start=Number(event.dataset.start),duration=Number(event.dataset.end)-start,height=duration*calendarScale-2;
+    event.style.top=`${start*calendarScale}px`;event.style.height=`${Math.max(1,height)}px`;
+    event.classList.toggle('compact',height<38);event.classList.toggle('tiny',height<14);
+  }
+  $('zoom-out').disabled=zoomTarget<=.75;$('zoom-in').disabled=zoomTarget>=5;
+}
+function zoomCalendar(target,clientY){
+  const scroller=$('calendar-scroll'),rect=scroller.getBoundingClientRect();
+  zoomY=clientY===undefined?scroller.clientHeight/2:Math.max(0,Math.min(scroller.clientHeight,clientY-rect.top));
+  zoomAnchor=(scroller.scrollTop+zoomY-16)/calendarScale;
+  zoomTarget=Math.max(.75,Math.min(5,target));
+  cancelAnimationFrame(zoomFrame);zooming=true;
+  let previous=performance.now();
+  function frame(now){
+    const dt=now-previous;previous=now;
+    const alpha=matchMedia('(prefers-reduced-motion: reduce)').matches?1:1-Math.exp(-Math.max(dt,1)/45);
+    calendarScale+=(zoomTarget-calendarScale)*alpha;
+    if(Math.abs(calendarScale-zoomTarget)<.002)calendarScale=zoomTarget;
+    layoutCalendar();
+    const before=scroller.scrollTop;
+    scroller.scrollTop=zoomAnchor*calendarScale+16-zoomY;
+    calendarOrigin+=scroller.scrollTop-before;
+    if(calendarScale!==zoomTarget)zoomFrame=requestAnimationFrame(frame);
+    else {zoomFrame=requestAnimationFrame(()=>{zooming=false;zoomFrame=0;});}
+  }
+  zoomFrame=requestAnimationFrame(frame);
+}
+$('zoom-in').onclick=()=>zoomCalendar(zoomTarget*1.25);
+$('zoom-out').onclick=()=>zoomCalendar(zoomTarget/1.25);
+$('calendar-scroll').addEventListener('wheel',e=>{
+  if(!e.ctrlKey)return;
+  e.preventDefault();zoomCalendar(zoomTarget*Math.exp(-e.deltaY*(e.deltaMode===1?.08:.008)),e.clientY);
+},{passive:false});
+// Safari exposes trackpad pinch as gesture events rather than Ctrl-wheel.
+let pinchStart=2;
+$('calendar-scroll').addEventListener('gesturestart',e=>{e.preventDefault();pinchStart=calendarScale;});
+$('calendar-scroll').addEventListener('gesturechange',e=>{e.preventDefault();zoomCalendar(pinchStart*e.scale,e.clientY);});
+$('calendar-scroll').addEventListener('gestureend',e=>e.preventDefault());
+document.addEventListener('pointerdown',()=>document.documentElement.dataset.input='pointer',true);
+document.addEventListener('keydown',()=>document.documentElement.dataset.input='keyboard',true);
+$('calendar-scroll').addEventListener('scroll',()=>{
+  if(zooming)return;
+  const amount=Math.max(0,Math.min(1,($('calendar-scroll').scrollTop-calendarOrigin)/72));
+  $('calendar-card').style.setProperty('--collapse',String(amount));
+},{passive:true});
+$('transition-preview').onchange=()=>{document.documentElement.dataset.transitionPreview=String($('transition-preview').checked);};
+$('calendar-button').onclick=()=>toggleCalendar(true);
+$('calendar-close').onclick=()=>toggleCalendar(false);
+$('calendar-demo').onchange=()=>{if($('popover').dataset.calendar==='open')renderCalendar();};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('popover').dataset.calendar==='open'){e.preventDefault();toggleCalendar(false);}});
 $('play').onclick=()=>{settle();unlockAudio();model.toggle();$('notification').hidden=true;render();};
 $('reset').onclick=()=>{settle();model.reset();$('notification').hidden=true;render();};
-$('settings-button').onclick=()=>{const open=$('settings').hidden;$('settings').hidden=!open;$('settings-button').setAttribute('aria-expanded',String(open));};
-document.addEventListener('pointerdown',e=>{if(!e.target.closest('.toolbar')){$('settings').hidden=true;$('settings-button').setAttribute('aria-expanded','false');}});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('settings').hidden=true;$('settings-button').setAttribute('aria-expanded','false');}});
+function toggleSettings(open){
+  if(open)endTaskEdit();
+  $('popover').dataset.settings=open?'open':'closed';
+  $('settings-button').setAttribute('aria-expanded',String(open));
+  $('settings-card').inert=!open;$('settings-card').setAttribute('aria-hidden',String(!open));
+  $('timer-page').inert=open;$('timer-page').setAttribute('aria-hidden',String(open));
+  (open?$('settings-close'):$('settings-button')).focus({preventScroll:true});
+}
+$('settings-button').onclick=()=>toggleSettings(true);
+$('settings-close').onclick=()=>toggleSettings(false);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('popover').dataset.settings==='open'){e.preventDefault();toggleSettings(false);}});
+let appearance='system';
+const systemAppearance=matchMedia('(prefers-color-scheme: dark)');
+function applyAppearance(){
+  $('popover').dataset.appearance=appearance==='system'?(systemAppearance.matches?'dark':'light'):appearance;
+  document.querySelectorAll('[data-theme]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.theme===appearance)));
+}
+document.querySelectorAll('[data-theme]').forEach(b=>b.onclick=()=>{appearance=b.dataset.theme;applyAppearance();});
+systemAppearance.addEventListener('change',()=>{if(appearance==='system')applyAppearance();});
+applyAppearance();
+$('palette').onchange=()=>{$('popover').dataset.palette=$('palette').value;render();};
+$('guides').onchange=()=>{$('ticks').toggleAttribute('hidden',$('guides').value==='none');};
+$('limit').onchange=()=>{settle();model.setLimit($('limit').checked);render();};
+$('sample').onchange=()=>{model.reset();const minutes=Number($('sample').value);model.setLimit(minutes<=120);$('limit').checked=model.limitTwoHours;model.work=minutes;model.rest=10;render();};
 $('auto').onchange=()=>{settle();model.autoStart=$('auto').checked;};
 $('fast').onchange=()=>{previous=performance.now();};
 $('menu-trigger').onclick=()=>{const hidden=!$('popover').hidden;$('popover').hidden=hidden;$('menu-trigger').setAttribute('aria-expanded',String(!hidden));};
 document.querySelectorAll('[data-phase]').forEach(b=>b.onclick=()=>{settle();model.stage(b.dataset.phase);$('notification').hidden=true;render();});
-document.querySelectorAll('button[data-appearance]').forEach(b=>b.onclick=()=>{$('popover').dataset.appearance=b.dataset.appearance;document.querySelectorAll('button[data-appearance]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));});
+
 $('hub-size').oninput=()=>{$('popover').style.setProperty('--hub',$('hub-size').value+'px');$('hub-output').value=$('hub-size').value+' pt';};
-$('glass').oninput=()=>{$('popover').style.setProperty('--glass',Number($('glass').value)/100);$('glass-output').value=$('glass').value<25?'近乎平面':$('glass').value<65?'轻':'明显';};
+$('glass').oninput=()=>{$('popover').style.setProperty('--glass',Number($('glass').value)/100);$('glass-output').value=$('glass').value<25?'Flat':$('glass').value<65?'Subtle':'Strong';};
+// Read-only screenshot fixtures do not alter the user's existing preview tab.
+const fixture=new URLSearchParams(location.search);
+if(fixture.has('minutes')) {
+  const minutes=Number(fixture.get('minutes'));
+  if([1,50,60,120,180,240].includes(minutes)) {
+    model.setLimit(minutes<=120);$('limit').checked=model.limitTwoHours;
+    model.work=minutes;model.rest=10;$('sample').value=String(minutes);
+  }
+}
+if(fixture.get('palette')==='warm'){$('palette').value='warm';$('popover').dataset.palette='warm';}
+if(fixture.get('guides')==='radial'){$('guides').value='radial';$('ticks').removeAttribute('hidden');}
+if(['light','dark'].includes(fixture.get('appearance'))){appearance=fixture.get('appearance');applyAppearance();}
 render();requestAnimationFrame(loop);
 </script>
 </html>

@@ -1,10 +1,31 @@
 # Work Rest Timer
 
+A lightweight, open-source macOS menu-bar timer with a circular Work / Rest dial
+and a local daily timeline. Native SwiftUI + AppKit, SQLite, macOS 26+.
+
+```sh
+./scripts/check.sh
+./scripts/build.sh
+open 'dist/Work Rest Timer.app'
+```
+
+See [Native app guide](NATIVE.md) for recording rules, storage, isolated testing
+and the current local-build distribution limits. Licensed under [MIT](LICENSE).
+The approved interactive HTML design remains in `prototype/flat-dial`.
+
+---
+
+## Earlier design and prototype notes
+
+# Work Rest Timer
+
 一个用于记录当前任务工作时间、提醒起身休息的 Mac 菜单栏小工具。
 
 最新视觉探索入口：[平面表盘 HTML/SVG 预览](prototype/flat-dial/README.md)。用于快速调整轻薄圆形层次、长短直线拨杆和较大的中央玻璃按钮，独立于原生样机。最新视觉方向以该预览说明和用户反馈为准，下面的原生预览及早期设计文档尚未同步这一轮改版。
 
 当前阶段：产品与交互设计 + 原生 SwiftUI 菜单栏预览。仅在专用临时目录运行，尚未接入通知中心与持久记录。
+
+最新材质对照：[独立 SwiftUI 玻璃表盘](prototype/glass-study/README.md)。这是组件材质试验，计时交互仍以 HTML 预览为准。
 
 ## 保存的设计版本
 
@@ -66,3 +87,5 @@ zsh prototype/native/check.sh
 先用预览确认拨杆错层、消耗方向、休息变色和 Reset 手感。以下方案目前保留为假设：自动开始默认开启、顺时针增加时长、Reset 保留时长设定。
 
 确认首页方向后，下一阶段是将预览收敛为可日常使用的本地记录应用，加入持久保存、通知授权与锁屏／休眠／跨日计时测试。历史统计页面继续单独讨论；手机仍不在范围内。
+
+Future feature ideas and deferred work: [Product backlog](TODO.md).

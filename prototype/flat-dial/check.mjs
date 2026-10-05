@@ -3,6 +3,10 @@ import { DialModel, angularDelta } from './model.mjs';
 import { point, sector, layers } from './geometry.mjs';
 
 const timer = new DialModel();
+assert.equal(timer.limitTwoHours, true);
+timer.setMinutes("work", 240);assert.equal(timer.work, 120);
+timer.setMinutes("rest", 180);assert.equal(timer.rest, 120);
+timer.setLimit(false);
 for (const minutes of [180, 240, 720, 1440]) {
   timer.setMinutes('work', minutes);
   assert.equal(timer.work, minutes);
@@ -46,3 +50,16 @@ assert.equal(sector(0,0,134), '');
 const beforeTurn = layers(0,119.999,134,.25), afterTurn = layers(0,120,134,.25);
 assert.ok(Math.abs(beforeTurn.opacity + (1-beforeTurn.opacity)*beforeTurn.tailOpacity - afterTurn.opacity) < 1e-12);
 console.log('PASS: unlimited practical durations, paused edits, unchanged ledger, rest alignment, wraparound and multi-turn layers');
+
+const limited = new DialModel();
+limited.setLimit(false);limited.setMinutes('work',240);limited.toggle();limited.advance(130*60);
+const before=limited.remaining;
+limited.setLimit(true);
+assert.equal(limited.remaining,before);
+limited.setMinutes('work',300);assert.equal(limited.work,240);
+limited.advance(before);
+assert.equal(limited.phase,'rest');assert.equal(limited.work,120);
+limited.reset();assert.equal(limited.work,120);
+limited.setMinutes('work',0);assert.equal(limited.work,0);
+limited.setMinutes('rest',0);assert.equal(limited.rest,0);
+console.log('PASS: default two-hour limit, explicit opt-out and non-truncating in-flight limit changes');
