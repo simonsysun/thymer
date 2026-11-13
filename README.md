@@ -1,6 +1,7 @@
 ---
 type: project
 start: 2026-09
+end: 2026-11-13
 ---
 
 # Thymer
